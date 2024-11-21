@@ -1,10 +1,10 @@
 
 public class Car implements Runnable{
-    private final int CarId;
-    private final int GateNum;
-    private final int Arrival;
-    private final int Duration;
-    private int WaitedTime = 0;
+    public final int CarId;
+    public final int GateNum;
+    public final int Arrival;
+    public final int Duration;
+    public int WaitedTime = 0;
 
     public Car(int CarId,int GateNum, int Arrival, int Duration)
     {
@@ -34,6 +34,14 @@ public class Car implements Runnable{
                 throw new RuntimeException(e);
             }
             ParkingLot.Car_Out(CarId,GateNum,Duration);
+    }
+    public int getCarId() {
+        return CarId;
+    }
+
+    // Getter for GateNum
+    public int getGateNum() {
+        return GateNum;
     }
 }
 
