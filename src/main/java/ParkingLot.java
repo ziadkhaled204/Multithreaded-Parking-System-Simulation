@@ -13,7 +13,7 @@ public class ParkingLot {
     // Method to acquire a parking spot
     public synchronized boolean tryAcquire() {
         if (parkingSpots.tryAcquire()) {
-            currentOccupied++;
+            ++currentOccupied;
             return true;
         }
         return false;
@@ -22,7 +22,7 @@ public class ParkingLot {
     // Method to release a parking spot
     public synchronized void release() {
         if (currentOccupied > 0) {
-            currentOccupied--;
+            --currentOccupied;
             parkingSpots.release();
         }
     }
@@ -31,21 +31,16 @@ public class ParkingLot {
     public synchronized void carIn(int id, int gateNum, int arriveTime, int waitedTime) {
         if (waitedTime == 0) {
             System.out.println("Car " + id + " from Gate " + gateNum + " arrived at time " + arriveTime);
-            System.out.println("Car " + id + " from Gate " + gateNum + " parked (Parking Status: "
-                    + (currentOccupied) + " spots Occupied)");
+            System.out.println("Car " + id + " from Gate " + gateNum + " parked (Parking Status: " + (currentOccupied) + " spots Occupied)");
         } else {
-            System.out.println("Car " + id + " from Gate " + gateNum + " parked after waiting for "
-                    + waitedTime + " seconds (Parking Status: "
-                    + (currentOccupied) + " spots Occupied)");
+            System.out.println("Car " + id + " from Gate " + gateNum + " parked after waiting for " + waitedTime + " seconds (Parking Status: " + (currentOccupied) + " spots Occupied)");
         }
     }
 
     // Car leaves the parking lot
     public synchronized void carOut(int id, int gateNum, int duration) {
-        System.out.println("Car " + id + " from Gate " + gateNum + " left after "
-                + duration + " seconds (Parking Status: "
-                + (currentOccupied) + " spots Occupied)");
-        release(); // Release the parking spot
+        release();
+        System.out.println("Car " + id + " from Gate " + gateNum + " left after " + duration + " seconds (Parking Status: " + (currentOccupied) + " spots Occupied)");
     }
 
     // Get the number of currently occupied spots

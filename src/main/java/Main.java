@@ -50,7 +50,6 @@ public class Main {
         Gate gate2 = new Gate(gate2Cars, parkingLot);
         Gate gate3 = new Gate(gate3Cars, parkingLot);
 
-
         // Start each gate in a separate thread
         Thread gate1Thread = new Thread(gate1);
         Thread gate2Thread = new Thread(gate2);
@@ -65,13 +64,15 @@ public class Main {
             gate1Thread.join();
             gate2Thread.join();
             gate3Thread.join();
+
+
         } catch (InterruptedException e) {
             System.err.println("Main thread was interrupted.");
             Thread.currentThread().interrupt();
         }
 
-        // Print final parking statistics after all threads finish
-        synchronized (parkingLot) { // Ensure thread-safe access
+        // Now that all threads are finished, print the final parking details
+        synchronized (parkingLot) {
             System.out.println("\nFinal Parking Lot Details");
             System.out.println("Total Cars Served: " + (gate1Cars.size() + gate2Cars.size() + gate3Cars.size()));
             System.out.println("Current Cars in Parking: " + parkingLot.getCurrentOccupiedSlots());
@@ -79,7 +80,8 @@ public class Main {
             System.out.println("- Gate 1 served " + gate1Cars.size() + " cars.");
             System.out.println("- Gate 2 served " + gate2Cars.size() + " cars.");
             System.out.println("- Gate 3 served " + gate3Cars.size() + " cars.");
-            System.out.println("Remaining parking spots: " + (parkingLot.getTotalSpots() - parkingLot.getCurrentOccupiedSlots()));
+            System.out.println("Remaining parking spots: "
+                    + (parkingLot.getTotalSpots() - parkingLot.getCurrentOccupiedSlots()));
         }
     }
 }
