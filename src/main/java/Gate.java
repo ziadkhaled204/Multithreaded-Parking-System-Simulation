@@ -1,7 +1,7 @@
 import java.util.List;
 
 public class Gate implements Runnable {
-    private final List<Car> cars;       // List of cars that will pass through this gate
+    private final List<Car> cars;
     private final ParkingLot parkingLot;
 
     public Gate(List<Car> cars, ParkingLot parkingLot) {
@@ -11,22 +11,19 @@ public class Gate implements Runnable {
 
     @Override
     public void run() {
-        // Create a thread for each car to allow parallel processing
+        // Process each car sequentially in the gate
         for (Car car : cars) {
-            new Thread(car).start(); // Start each car thread in parallel
-
             try {
-                // Sleep for 1 second after starting the car thread (not after its execution)
-                Thread.sleep(1000); // 1000 milliseconds = 1 second
+                // Run the car's logic
+                car.run();
 
+                // Sleep for 1 second between processing each car
+                Thread.sleep(200);
             } catch (InterruptedException e) {
-                // Handle thread interruption during sleep
-                System.out.println("Gate thread was interrupted while waiting between cars.");
+                System.out.println("Gate was interrupted while processing cars.");
                 Thread.currentThread().interrupt();  // Preserve interrupt status
-                break;  // Exit loop if the gate processing is interrupted
             }
         }
-
-        System.out.println("Gate has finished starting all car threads.");
+        System.out.println("Gate has finished processing all cars.");
     }
 }
