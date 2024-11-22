@@ -28,9 +28,8 @@ public class Car implements IProcess, Runnable {
             Thread.sleep(carData.getParkingDuration() * 1000); // the car is parking
 
             // The car is pulling out of the parking lot.
-            System.out.println("Car "+ carData.getId() +" from Gate " + carData.getGate() + " left after " + carData.getParkingDuration() + " units of time. (Parking Status: " + parkingSemaphore.getOccupied() + " spots occupied)");
             parkingSemaphore.signall();
-
+            System.out.println("Car "+ carData.getId() +" from Gate " + carData.getGate() + " left after " + carData.getParkingDuration() + " units of time. (Parking Status: " + parkingSemaphore.getOccupied() + " spots occupied)");
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
