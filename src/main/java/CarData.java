@@ -1,12 +1,12 @@
 public class CarData {
     private int gate;
-    private int carId;
+    private int id;
     private int arrivalTime;
     private int parkingDuration;
 
-    public CarData(int gate, int carId, int arrivalTime, int parkingDuration) {
+    public CarData(int gate, int id, int arrivalTime, int parkingDuration) {
         this.gate = gate;
-        this.carId = carId;
+        this.id = id;
         this.arrivalTime = arrivalTime;
         this.parkingDuration = parkingDuration;
     }
@@ -15,8 +15,8 @@ public class CarData {
         return gate;
     }
 
-    public int getCarId() {
-        return carId;
+    public int getId() {
+        return id;
     }
 
     public int getArrivalTime() {

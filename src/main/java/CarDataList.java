@@ -32,12 +32,22 @@ public class CarDataList {
         return cars.size();
     }
 
+    public int getNumOfCarsFromGate(int index){
+        int num = 0;
+        for(int i=0 ; i<cars.size() ; i++){
+            if(getCar(i).getGate() == index){
+                num++;
+            }
+        }
+        return num;
+    }
+
     public void print() {
         if (cars.isEmpty()) {
             System.out.println("No cars in the list.");
         } else {
             for (CarData car : cars) {
-                System.out.println("Car ID: " + car.getCarId());
+                System.out.println("Car ID: " + car.getId());
                 System.out.println("Gate: " + car.getGate());
                 System.out.println("Arrival Time: " + car.getArrivalTime());
                 System.out.println("Parking Duration: " + car.getParkingDuration());
