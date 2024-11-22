@@ -9,14 +9,14 @@ public class Semaphore {
 
     public Semaphore(int size) {
         initialSize = size;
-        this.size = new AtomicInteger(size);  // استخدام AtomicInteger
+        this.size = new AtomicInteger(size);
         q = new LinkedList<IProcess>();
     }
 
     public void waitt(IProcess p) {
         int currentSize = size.get();
         if (currentSize > 0) {
-            size.decrementAndGet();  // تقليص العدد بطريقة ذرة
+            size.decrementAndGet();
         } else {
             q.add(p);
             try {
@@ -32,11 +32,11 @@ public class Semaphore {
             IProcess nextProcess = q.remove();
             nextProcess.wakeup();
         } else {
-            size.incrementAndGet();  // زيادة العدد بطريقة ذرة
+            size.incrementAndGet();
         }
     }
 
     public int getOccupied() {
-        return Math.max(0, initialSize - size.get());  // الحصول على العدد باستخدام get()
+        return Math.max(0, initialSize - size.get());
     }
 }
