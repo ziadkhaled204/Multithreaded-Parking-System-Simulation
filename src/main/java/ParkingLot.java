@@ -1,55 +1,60 @@
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.concurrent.Semaphore;
 
 public class ParkingLot {
-    private static int availablePlaces;
-    private int currentOccupied = 0;
-    public ParkingLot(int av_places){availablePlaces=av_places;}
-    public static boolean check_if_there_avPlaces(){return availablePlaces>0;}
-    public static synchronized boolean Car_In(int id,int gateNum, int arriveTime,int waitedTime)
-    {
-        if(check_if_there_avPlaces()) {
-            availablePlaces--;
-            int Parking_Status = 4 - availablePlaces;
+    private final Semaphore parkingSpots; // Semaphore to manage available spots
+    static private int currentOccupied = 0; // Tracks the number of occupied spots
+    private final int totalSpots; // Total number of parking spots
 
-            if (waitedTime == 0) {
-                System.out.println("car " + id + " from gate " + gateNum + " arrived at time " + arriveTime);
-                System.out.println("car " + id + " from gate " + gateNum + " Parked " + "( Parking Status: " + (Parking_Status-1) + " spots left )");
-            }
-            else {
-                System.out.println("car " + id + " from gate " + gateNum + " parked after waiting for " + waitedTime + " of time");
-            }
+    public ParkingLot(int totalSpots) {
+        this.totalSpots = totalSpots;
+        this.parkingSpots = new Semaphore(totalSpots, true);
+    }
+
+    // Method to acquire a parking spot
+    public synchronized boolean tryAcquire() {
+        if (parkingSpots.tryAcquire()) {
+            currentOccupied++;
             return true;
         }
-        else{
-            System.err.println("car " + id +" from gate "+ gateNum +" waiting for a spot ");
-        }       return false;}
-
-
-
-    public static synchronized void Car_Out(int id,int gateNum,int Duration){
-        availablePlaces++;
-        int Parking_Status = 4 - availablePlaces;
-        System.out.println("car " + id +" from gate"+ gateNum+" left after "+ Duration +" seconds "+"(Parking Status: " + (Parking_Status+1) + " spots occupied");
+        return false;
     }
-    public static int getCurrentOccupiedSlots(List<ParkingLot> parkingLots) {
-        int totalOccupied = 0;
-        for (ParkingLot lot : parkingLots) {
-            totalOccupied += lot.currentOccupied;
+
+    // Method to release a parking spot
+    public synchronized void release() {
+        if (currentOccupied > 0) {
+            currentOccupied--;
+            parkingSpots.release();
         }
-        return totalOccupied;
     }
 
-    public void incrementOccupied() {
-        this.currentOccupied++;
+    // Car enters the parking lot
+    public synchronized void carIn(int id, int gateNum, int arriveTime, int waitedTime) {
+        if (waitedTime == 0) {
+            System.out.println("Car " + id + " from Gate " + gateNum + " arrived at time " + arriveTime);
+            System.out.println("Car " + id + " from Gate " + gateNum + " parked (Parking Status: "
+                    + (currentOccupied) + " spots Occupied)");
+        } else {
+            System.out.println("Car " + id + " from Gate " + gateNum + " parked after waiting for "
+                    + waitedTime + " seconds (Parking Status: "
+                    + (currentOccupied) + " spots Occupied)");
+        }
     }
 
-    public void decrementOccupied() {
-        this.currentOccupied--;
+    // Car leaves the parking lot
+    public synchronized void carOut(int id, int gateNum, int duration) {
+        System.out.println("Car " + id + " from Gate " + gateNum + " left after "
+                + duration + " seconds (Parking Status: "
+                + (currentOccupied) + " spots Occupied)");
+        release(); // Release the parking spot
     }
 
+    // Get the number of currently occupied spots
+    public static synchronized int getCurrentOccupiedSlots() {
+        return currentOccupied;
+    }
+
+    // Get the total number of parking spots
+    public int getTotalSpots() {
+        return totalSpots;
+    }
 }

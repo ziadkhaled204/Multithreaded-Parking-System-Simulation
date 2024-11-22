@@ -6,13 +6,15 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+        ParkingLot parkingLot = new ParkingLot(4);
+
         // Create lists to hold cars for each gate
         List<Car> gate1Cars = new ArrayList<>();
         List<Car> gate2Cars = new ArrayList<>();
         List<Car> gate3Cars = new ArrayList<>();
 
         // Input file name
-        String filename = "parking_simulation_data.txt";
+        String filename = "data.txt";
 
         try {
             // Read the input file
@@ -28,7 +30,7 @@ public class Main {
                 int parkTime = Integer.parseInt(parts[3].split(" ")[1]);
 
                 // Create a Car object based on parsed values
-                Car car = new Car(carId, gateNum, arriveTime, parkTime);
+                Car car = new Car(carId, gateNum, arriveTime, parkTime, parkingLot);
 
                 // Add the car to the appropriate gate list based on the gate number
                 switch (gateNum) {
@@ -43,16 +45,10 @@ public class Main {
             return;
         }
 
-        // Create a list of ParkingLot instances, each with a capacity of 1 slot
-        List<ParkingLot> slots = new ArrayList<>(4);
-        for (int i = 0; i < 4; i++) {
-            slots.add(new ParkingLot(1)); // Each parking lot has a capacity of 1
-        }
-
-        // Create Gate instances, each using the list of parking lots
-        Gate gate1 = new Gate(gate1Cars, new ParkingLot(1));
-        Gate gate2 = new Gate(gate2Cars, new ParkingLot(1));
-        Gate gate3 = new Gate(gate3Cars, new ParkingLot(1));
+        // Create Gate instances, each with its list of cars
+        Gate gate1 = new Gate(gate1Cars, parkingLot);
+        Gate gate2 = new Gate(gate2Cars, parkingLot);
+        Gate gate3 = new Gate(gate3Cars, parkingLot);
 
         // Start each gate in a separate thread
         Thread gate1Thread = new Thread(gate1);
@@ -73,12 +69,17 @@ public class Main {
             Thread.currentThread().interrupt();
         }
 
-        // Print final parking statistics
-        System.out.println("\nTotal Cars Served: " + (gate1Cars.size() + gate2Cars.size() + gate3Cars.size()));
-        System.out.println("Current Cars in Parking: " + ParkingLot.getCurrentOccupiedSlots(slots));
-        System.out.println("Details:");
-        System.out.println("- Gate 1 served " + gate1Cars.size() + " cars.");
-        System.out.println("- Gate 2 served " + gate2Cars.size() + " cars.");
-        System.out.println("- Gate 3 served " + gate3Cars.size() + " cars.");
+        // Print final parking statistics after all threads finish
+        synchronized (parkingLot) { // Ensure thread-safe access
+            System.out.println("\n=== Final Parking Lot Details ===");
+            System.out.println("Total Cars Served: " + (gate1Cars.size() + gate2Cars.size() + gate3Cars.size()));
+            System.out.println("Current Cars in Parking: " + parkingLot.getCurrentOccupiedSlots());
+            System.out.println("Details:");
+            System.out.println("- Gate 1 served " + gate1Cars.size() + " cars.");
+            System.out.println("- Gate 2 served " + gate2Cars.size() + " cars.");
+            System.out.println("- Gate 3 served " + gate3Cars.size() + " cars.");
+            System.out.println("Remaining parking spots: "
+                    + (parkingLot.getTotalSpots() - parkingLot.getCurrentOccupiedSlots()));
+        }
     }
 }

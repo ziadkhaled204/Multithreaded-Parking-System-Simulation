@@ -1,47 +1,38 @@
-
-public class Car implements Runnable{
+public class Car implements Runnable {
     public final int CarId;
     public final int GateNum;
     public final int Arrival;
     public final int Duration;
     public int WaitedTime = 0;
+    private final ParkingLot parkingLot;
 
-    public Car(int CarId,int GateNum, int Arrival, int Duration)
-    {
-        this.CarId=CarId;
-        this.GateNum=GateNum;
-        this.Arrival=Arrival;
-        this.Duration=Duration;
+    public Car(int CarId, int GateNum, int Arrival, int Duration, ParkingLot parkingLot) {
+        this.CarId = CarId;
+        this.GateNum = GateNum;
+        this.Arrival = Arrival;
+        this.Duration = Duration;
+        this.parkingLot = parkingLot;
     }
+
     @Override
-    public void run()
-    {
-        while(!ParkingLot.check_if_there_avPlaces())
-            {
-                try {
-                    Thread.sleep(1000);
-                    WaitedTime++;
-                } catch (InterruptedException e) {
-                    System.out.println("Car " + CarId + " from Gate " + GateNum + " was interrupted while waiting.");
-                    Thread.currentThread().interrupt();
-                    return;
-                }
-            }
-        ParkingLot.Car_In(CarId,GateNum,Arrival,WaitedTime);
-        try {
-                Thread.sleep(Duration * 1000L);
+    public void run() {
+        while (!parkingLot.tryAcquire()) {
+            try {
+                Thread.sleep(1000); // Wait for 1 second
+                WaitedTime++;
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                System.out.println("Car " + CarId + " from Gate " + GateNum + " was interrupted while waiting.");
+                Thread.currentThread().interrupt();
+                return;
             }
-            ParkingLot.Car_Out(CarId,GateNum,Duration);
-    }
-    public int getCarId() {
-        return CarId;
-    }
-
-    // Getter for GateNum
-    public int getGateNum() {
-        return GateNum;
+        }
+        parkingLot.carIn(CarId, GateNum, Arrival, WaitedTime);
+        try {
+            Thread.sleep(Duration * 1000L); // Simulate parking duration
+        } catch (InterruptedException e) {
+            System.out.println("Car " + CarId + " was interrupted while parked.");
+            Thread.currentThread().interrupt();
+        }
+        parkingLot.carOut(CarId, GateNum, Duration);
     }
 }
-
